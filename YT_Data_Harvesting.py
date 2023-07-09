@@ -118,3 +118,12 @@ def get_video_data(youtube, playlist_id):
       print("An HTTP error occurred:", e)
       return []
 
+
+def get_comments_data(youtube, video_id):
+  try:
+    comments_request = youtube.commentThreads().list(
+      part="snippet",
+      videoId=video_id,
+      maxResults=100
+    )
+    comments_response = comments_request.execute()
