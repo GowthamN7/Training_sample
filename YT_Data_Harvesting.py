@@ -48,4 +48,12 @@ def get_playlists_data(youtube, channel_id):
       }
 
       
-      
+      videos_data = get_video_data(youtube, playlist["id"])
+      playlist_data["videos"] = videos_data
+
+      playlists_data.append(playlist_data)
+
+    return playlists_data, len(playlists)
+  except HttpError as e:
+    print("An error occurred:", e)
+    return [], 0
