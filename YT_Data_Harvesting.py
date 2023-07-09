@@ -111,12 +111,12 @@ def get_video_data(youtube, playlist_id):
 
                   video_data_map[video_id] = video_data
 
-            videos_data.append(video_data)
+              videos_data.append(video_data)
 
-      return videos_data
+        return videos_data
   except HttpError as e:
-      print("An HTTP error occurred:", e)
-      return []
+        print("An HTTP error occurred:", e)
+        return []
 
 
 def get_comments_data(youtube, video_id):
