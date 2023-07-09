@@ -111,7 +111,7 @@ def get_video_data(youtube, playlist_id):
 
                   video_data_map[video_id] = video_data
 
-              videos_data.append(video_data)
+            videos_data.append(video_data)
 
       return videos_data
   except HttpError as e:
