@@ -75,7 +75,7 @@ def get_video_data(youtube, playlist_id):
     videos_data = []
     video_data_map = {}
 
-      for i in range(0, len(video_ids), 50):
+    for i in range(0, len(video_ids), 50):
           video_ids_batch = video_ids[i:i+50]
           video_request = youtube.videos().list(
               part="snippet,contentDetails,statistics,status",
