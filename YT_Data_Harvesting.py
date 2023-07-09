@@ -127,3 +127,40 @@ def get_comments_data(youtube, video_id):
       maxResults=100
     )
     comments_response = comments_request.execute()
+
+    comments = []
+    while "items" in comments_response:
+      for item in comments_response["items"]:
+        comment_data = {
+          "comment_id": item["id"],
+          "comment_text": item["snippet"]["topLevelComment"]["snippet"]["textDisplay"],
+          "comment_author": item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"],
+          "comment_published_at": item["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
+        }
+        comments.append(comment_data)
+
+      if "nextPageToken" in comments_response:
+        comments_request = youtube.commentThreads().list(
+          part="snippet",
+          videoId=video_id,
+          maxResults=100,
+          pageToken=comments_response["nextPageToken"]
+        )
+        comments_response = comments_request.execute()
+      else:
+        break
+    return comments
+  except HttpError as e:
+    print("An error occurred:", e)
+    return []
+
+def get_multiple_channel_data(channel_ids,apikey):
+  youtube = youtube_api_connect(apikey)
+  channel_id_list = channel_ids.split(",")
+  all_data = []
+  datas = []
+
+  for channel_id in channel_id_list:
+    channel_data = get_channel_data(youtube, channel_id.strip())
+    if channel_data:
+      playlist_data, playlist_count = get_playlists_data(youtube, channel_id.strip())
