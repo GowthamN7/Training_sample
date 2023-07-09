@@ -28,3 +28,24 @@ def get_channel_data(youtube, channel_id):
   except HttpError as e:
     print("An error occurred:", e)
     return None
+
+def get_playlists_data(youtube, channel_id):
+  try:
+    playlists_request = youtube.playlists().list(
+      part = "snippet",
+      channelId = channel_id,
+      maxResults = 50
+    )
+    playlists_response = playlists_request.execute()
+
+    playlists = playlists_response.get("items", [])
+    playlists_data = []
+    for playlist in playlists:
+      playlist_data = {
+        "playlist_name": playlist["snippet"]["title"],
+        "playlist_id": playlist["id"],
+        "videos": []
+      }
+
+      
+      
