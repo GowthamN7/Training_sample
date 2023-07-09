@@ -1,0 +1,6 @@
+google-api-python-client==2.92.0
+streamlit==1.24.1
+pymongo==4.4.0
+pandas==2.0.3
+mysql-connector-python==8.0.33
+isodate2==0.9.0
