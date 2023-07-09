@@ -69,11 +69,11 @@ def get_video_data(youtube, playlist_id):
 
     playlist_items_response = playlist_items_request.execute()
 
-      playlist_items = playlist_items_response.get("items", [])
-      video_ids = [item["snippet"]["resourceId"]["videoId"] for item in playlist_items]
+    playlist_items = playlist_items_response.get("items", [])
+    video_ids = [item["snippet"]["resourceId"]["videoId"] for item in playlist_items]
 
-      videos_data = []
-      video_data_map = {}
+    videos_data = []
+    video_data_map = {}
 
       for i in range(0, len(video_ids), 50):
           video_ids_batch = video_ids[i:i+50]
