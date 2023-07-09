@@ -76,47 +76,47 @@ def get_video_data(youtube, playlist_id):
     video_data_map = {}
 
     for i in range(0, len(video_ids), 50):
-          video_ids_batch = video_ids[i:i+50]
-          video_request = youtube.videos().list(
-              part="snippet,contentDetails,statistics,status",
-              id=",".join(video_ids_batch)
-          )
-          video_response = video_request.execute()
+      video_ids_batch = video_ids[i:i+50]
+      video_request = youtube.videos().list(
+        part="snippet,contentDetails,statistics,status",
+        id=",".join(video_ids_batch)
+      )
+      video_response = video_request.execute()
 
-          videos = video_response.get("items", [])
-          for video in videos:
-              video_id = video["id"]
-              video_data = video_data_map.get(video_id)
+      videos = video_response.get("items", [])
+      for video in videos:
+          video_id = video["id"]
+          video_data = video_data_map.get(video_id)
 
-              if video_data is None:
-                  tags = video["snippet"].get("tags", [])
-                  duration = isodate.parse_duration(video["contentDetails"]["duration"]).total_seconds()
+          if video_data is None:
+            tags = video["snippet"].get("tags", [])
+            duration = isodate.parse_duration(video["contentDetails"]["duration"]).total_seconds()
 
-                  video_data = {
-                      "video_id": video_id,
-                      "video_title": video["snippet"]["title"],
-                      "video_description": video["snippet"]["description"],
-                      "tags": tags,
-                      "published_at": video["snippet"]["publishedAt"],
-                      "view_count": video["statistics"]["viewCount"],
-                      "like_count": video["statistics"]["likeCount"],
-                      "dislike_count": 0,
-                      "favorite_count": video["statistics"]["favoriteCount"],
-                      "comment_count": video["statistics"]["commentCount"],
-                      "duration": duration,
-                      "thumbnail": video["snippet"]["thumbnails"]["default"]["url"],
-                      "caption_status": "Available" if video["contentDetails"]["caption"] else "Not Available",
-                      "comments": get_comments_data(youtube, video_id)
-                  }
+            video_data = {
+              "video_id": video_id,
+              "video_title": video["snippet"]["title"],
+              "video_description": video["snippet"]["description"],
+              "tags": tags,
+              "published_at": video["snippet"]["publishedAt"],
+              "view_count": video["statistics"]["viewCount"],
+              "like_count": video["statistics"]["likeCount"],
+              "dislike_count": 0,
+              "favorite_count": video["statistics"]["favoriteCount"],
+              "comment_count": video["statistics"]["commentCount"],
+              "duration": duration,
+              "thumbnail": video["snippet"]["thumbnails"]["default"]["url"],
+              "caption_status": "Available" if video["contentDetails"]["caption"] else "Not Available",
+              "comments": get_comments_data(youtube, video_id)
+            }
 
-                  video_data_map[video_id] = video_data
+            video_data_map[video_id] = video_data
 
-              videos_data.append(video_data)
+          videos_data.append(video_data)
 
-        return videos_data
+    return videos_data
   except HttpError as e:
-        print("An HTTP error occurred:", e)
-        return []
+    print("An HTTP error occurred:", e)
+    return []
 
 
 def get_comments_data(youtube, video_id):
