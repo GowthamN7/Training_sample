@@ -356,6 +356,8 @@ def main():
       if st.button("Store Data"):
         filterdata = store_data_mongo(alldata)
         store_data_sql(conn,cursor,filterdata)
+
+  
   with tab2:
     st.header("Table")
     if conn:
