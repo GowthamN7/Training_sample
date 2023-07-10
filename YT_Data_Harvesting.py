@@ -164,3 +164,22 @@ def get_multiple_channel_data(channel_ids,apikey):
     channel_data = get_channel_data(youtube, channel_id.strip())
     if channel_data:
       playlist_data, playlist_count = get_playlists_data(youtube, channel_id.strip())
+
+      data = {
+          "Channel_name": channel_data["snippet"]["title"],
+          "Channel_Id": channel_data["id"],
+          "Subscription_count": channel_data["statistics"]["subscriberCount"],
+          "Channel_views": channel_data["statistics"]["viewCount"],
+          "Channel_description": channel_data["snippet"]["description"],
+          "Playlist_count": playlist_count,
+          "Playlists": playlist_data
+        }
+      c_data = data.copy()
+
+      if "Playlists" in c_data:
+        del c_data["Playlists"]
+
+      datas.append(c_data)
+      all_data.append({"channel":data})
+
+  return datas,all_data
