@@ -1,5 +1,5 @@
 import streamlit as st
-import json
+import json5
 import pymongo
 import mysql.connector
 import isodate
