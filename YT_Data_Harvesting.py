@@ -335,3 +335,55 @@ def query_sql_data(cursor, pos):
     return df
   else:
     return None
+
+
+
+def main():
+  st.header("YT_Data_Harvesting")
+  tab1, tab2, tab3 = st.tabs(["Data", "Table","Query"])
+
+  conn = sql_connect()
+  cursor = conn.cursor()
+
+  with tab1:
+    st.header("Fetch Data")
+    apikey = st.text_input("API Key:")
+    c_id = st.text_input("Channel ID:")
+
+    if c_id and apikey:
+      chdata, alldata = get_multiple_channel_data(c_id,apikey)
+      st.json(chdata)
+      if st.button("Store Data"):
+        filterdata = store_data_mongo(alldata)
+        store_data_sql(conn,cursor,filterdata)
+  with tab2:
+    st.header("Table")
+    if conn:
+      q1 = "SELECT * FROM channeldata"
+      cursor.execute(q1)
+      rows = cursor.fetchall()
+
+      df = pd.DataFrame(rows, columns=cursor.column_names)
+      df.index = df.index + 1
+
+      st.write("Channels List")
+
+      table_style = f"""
+        <style>
+          .dataframe tbody tr {{
+            height: 30px;
+          }}
+          .dataframe table {{
+            height: 200px;
+            width: 1000px;
+          }}
+          .dataframe thead th:first-child,
+          .dataframe tbody tr:first-child {{
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+          }}
+        </style>
+      """
+      
