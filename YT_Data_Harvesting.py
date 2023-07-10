@@ -190,8 +190,8 @@ def store_data_mongo(alldata):
   mongourl = st.secrets["MONGOURL"]
   try:
     with pymongo.MongoClient(mongourl) as client:
-      db = client['YoutubeHacks']
-      collection = db['ChannelData']
+      db = client['YT_Data']
+      collection = db['Col_1']
       inserted_channel_ids = []
 
       for i in alldata:
