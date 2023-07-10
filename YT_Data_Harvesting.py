@@ -386,4 +386,56 @@ def main():
           }}
         </style>
       """
-      
+      st.markdown(table_style, unsafe_allow_html=True)
+      st.dataframe(df)
+
+      q2 = "SELECT * FROM playlistdata"
+      cursor.execute(q2)
+      playlist_rows = cursor.fetchall()
+      playlist_df = pd.DataFrame(playlist_rows, columns=cursor.column_names)
+      playlist_df.index = playlist_df.index + 1
+      st.write("Playlist List")
+      st.dataframe(playlist_df)
+
+      q3 = "SELECT * FROM videodata"
+      cursor.execute(q3)
+      video_rows = cursor.fetchall()
+      video_df = pd.DataFrame(video_rows, columns=cursor.column_names)
+      video_df.index = video_df.index + 1
+      st.write("Video List")
+      st.dataframe(video_df)
+
+      q4 = "SELECT * FROM commentdata"
+      cursor.execute(q4)
+      comment_rows = cursor.fetchall()
+      comment_df = pd.DataFrame(comment_rows, columns=cursor.column_names)
+      comment_df.index = comment_df.index + 1
+      st.write("Comment List")
+      st.dataframe(comment_df)
+
+
+with tab3:
+  st.header("Query")
+
+  options = [
+    "Select a Question from the List",
+    "What are the names of all the videos and their corresponding channels?",
+    "Which channels have the most number of videos, and how many videos do they have?",
+    "What are the top 10 most viewed videos and their respective channels?",
+    "How many comments were made on each video, and what are their corresponding video names?",
+    "Which videos have the highest number of likes, and what are their corresponding channel names?",
+    "What is the total number of likes and dislikes for each video, and what are their corresponding video names?",
+    "What is the total number of views for each channel, and what are their corresponding channel names?",
+    "What are the names of all the channels that have published videos in the year 2022?",
+    "What is the average duration of all videos in each channel, and what are their corresponding channel names?",
+    "Which videos have the highest number of comments, and what are their corresponding channel names?"
+  ]
+
+  selected_option = st.selectbox("Ask a Question:", options)
+
+  position = options.index(selected_option)
+  retriveddata = query_sql_data(cursor,position)
+  st.table(retriveddata)
+
+if __name__ == "__main__":
+  main()
