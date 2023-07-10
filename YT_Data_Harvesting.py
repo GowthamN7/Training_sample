@@ -228,3 +228,85 @@ def sql_connect():
          database = dbname
     )
   return conn
+
+
+def store_data_sql(conn,cursor,filterdata):
+  try:
+    if conn:
+      mongourl = st.secrets["MONGOURL"]
+      mongoclient = pymongo.MongoClient(mongourl)
+      db = mongoclient['']
+      collection = db['']
+      fields = "channel.Channel_Id"
+
+      for i in filterdata:
+
+        check_query = f"SELECT channel_id FROM channeldata WHERE channel_id = %s"
+        cursor.execute(check_query, (i,))
+        result = cursor.fetchone()
+
+        if result:
+          print(result)
+          st.write("Channel Data Inserted Already! Try with another Channel")
+        else:
+          document = collection.find_one({fields: i})
+
+          channel_data = document['channel']
+          channel_values = (
+            channel_data['Channel_Id'],
+            channel_data['Channel_name'],
+            channel_data['Subscription_count'],
+            channel_data['Channel_views'],
+            channel_data['Playlist_count'],
+            channel_data['Channel_description']
+          )
+          q1 = "INSERT INTO channeldata (channel_id, channel_name, subscription_count, channel_views, playlist_count, channel_description) VALUES (%s, %s, %s, %s, %s, %s)"
+          cursor.execute(q1, channel_values)
+
+          playlist_values = []
+          video_values = []
+          comment_values = []
+
+          for playlist in channel_data['Playlists']:
+            playlist_values.append((
+              playlist['playlist_id'],
+              channel_data['Channel_Id'],
+              playlist['playlist_name']
+            ))
+
+            for video in playlist['videos']:
+              video_values.append((
+                video['video_id'],
+                playlist['playlist_id'],
+                video['video_title'],
+                video['video_description'],
+                video['published_at'],
+                video['view_count'],
+                video['like_count'],
+                video['comment_count'],
+                video['duration'],
+                video['thumbnail'],
+                video['caption_status']
+              ))
+
+            for comment in video['comments']:
+              comment_values.append((
+                comment['comment_id'],
+                video['video_id'],
+                comment['comment_text'],
+                comment['comment_author'],
+                comment['comment_published_at']
+              ))
+
+            q2 = "INSERT INTO playlistdata (playlist_id, channel_id, playlist_name) VALUES (%s, %s, %s)"
+            cursor.executemany(q2, playlist_values)
+
+            q3 = "INSERT INTO videodata (video_id, playlist_id, video_name, video_description, published_date, view_count, like_count, comment_count, duration, thumbnail, caption_status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            cursor.executemany(q3, video_values)
+
+            q4 = "INSERT INTO commentdata (comment_id, video_id, comment_text, comment_author, comment_published_date) VALUES (%s, %s, %s, %s, %s)"
+            cursor.executemany(q4, comment_values)
+
+  except mysql.connector.Error as err:
+    st.write("Error: {}".format(err))
+    return False
