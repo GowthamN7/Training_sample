@@ -211,4 +211,20 @@ def store_data_mongo(alldata):
   except pymongo.errors.PyMongoError as e:
     st.write("An error occurred while storing data in MongoDB:", str(e))
   return None
-  
+
+
+
+def sql_connect():
+  sql_host = st.secrets["DB_HOST"]
+  sql_user = st.secrets["DB_USER"]
+  sql_password =st.secrets["DB_PASS"]
+  dbname = st.secrets["DB_NAME"]
+  sql_port = st.secrets["DB_PORT"]
+  conn = mysql.connector.connect(
+         host = sql_host,
+         port=sql_port,
+         user=sql_user,
+         password=sql_password,
+         database = dbname
+    )
+  return conn
