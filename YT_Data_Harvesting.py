@@ -201,3 +201,9 @@ def store_data_mongo(alldata):
           inserted_channel_ids.append(channel_id)
         else:
           insert_result = collection.insert_one(i)
+
+          if insert_result.inserted_id:
+            inserted_channel_ids.append(channel_id)
+          else:
+            st.write("Failed to insert data.")
+            
