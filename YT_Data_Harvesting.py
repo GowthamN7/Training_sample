@@ -416,28 +416,28 @@ def main():
       st.dataframe(comment_df)
 
 
-with tab3:
-  st.header("Query")
+  with tab3:
+    st.header("Query")
 
-  options = [
-    "Select a Question from the List",
-    "What are the names of all the videos and their corresponding channels?",
-    "Which channels have the most number of videos, and how many videos do they have?",
-    "What are the top 10 most viewed videos and their respective channels?",
-    "How many comments were made on each video, and what are their corresponding video names?",
-    "Which videos have the highest number of likes, and what are their corresponding channel names?",
-    "What is the total number of likes and dislikes for each video, and what are their corresponding video names?",
-    "What is the total number of views for each channel, and what are their corresponding channel names?",
-    "What are the names of all the channels that have published videos in the year 2022?",
-    "What is the average duration of all videos in each channel, and what are their corresponding channel names?",
-    "Which videos have the highest number of comments, and what are their corresponding channel names?"
-  ]
+    options = [
+      "Select a Question from the List",
+      "What are the names of all the videos and their corresponding channels?",
+      "Which channels have the most number of videos, and how many videos do they have?",
+      "What are the top 10 most viewed videos and their respective channels?",
+      "How many comments were made on each video, and what are their corresponding video names?",
+      "Which videos have the highest number of likes, and what are their corresponding channel names?",
+      "What is the total number of likes and dislikes for each video, and what are their corresponding video names?",
+      "What is the total number of views for each channel, and what are their corresponding channel names?",
+      "What are the names of all the channels that have published videos in the year 2022?",
+      "What is the average duration of all videos in each channel, and what are their corresponding channel names?",
+      "Which videos have the highest number of comments, and what are their corresponding channel names?"
+    ]
 
-  selected_option = st.selectbox("Ask a Question:", options)
+    selected_option = st.selectbox("Ask a Question:", options)
 
-  position = options.index(selected_option)
-  retriveddata = query_sql_data(cursor,position)
-  st.table(retriveddata)
+    position = options.index(selected_option)
+    retriveddata = query_sql_data(cursor,position)
+    st.table(retriveddata)
 
 if __name__ == "__main__":
   main()
