@@ -183,3 +183,21 @@ def get_multiple_channel_data(channel_ids,apikey):
       all_data.append({"channel":data})
 
   return datas,all_data
+
+
+
+def store_data_mongo(alldata):
+  mongourl = st.secrets["MONGOURL"]
+  try:
+    with pymongo.MongoClient(mongourl) as client:
+      db = client['YoutubeHacks']
+      collection = db['ChannelData']
+      inserted_channel_ids = []
+
+      for i in alldata:
+        channel_id = i["channel"]["Channel_Id"]
+        filter_query = {"channel.Channel_Id": channel_id}
+        if collection.count_documents(filter_query) > 0:
+          inserted_channel_ids.append(channel_id)
+        else:
+          insert_result = collection.insert_one(i)
