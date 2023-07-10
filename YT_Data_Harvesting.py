@@ -215,10 +215,10 @@ def store_data_mongo(alldata):
 
 
 def sql_connect():
-  sql_host = st.secrets["127.0.0.1"]
-  sql_user = st.secrets["root"]
-  sql_password =st.secrets["Gixxer@7071"]
-  dbname = st.secrets["yt_data"]
+  sql_host = st.secrets["host"]
+  sql_user = st.secrets["user"]
+  sql_password =st.secrets["pass"]
+  dbname = st.secrets["name"]
   sql_port = st.secrets["3306"]
   conn = mysql.connector.connect(
          host = sql_host,
