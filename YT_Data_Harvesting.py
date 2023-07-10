@@ -207,3 +207,8 @@ def store_data_mongo(alldata):
           else:
             st.write("Failed to insert data.")
             
+      return inserted_channel_ids
+  except pymongo.errors.PyMongoError as e:
+    st.write("An error occurred while storing data in MongoDB:", str(e))
+  return None
+  
