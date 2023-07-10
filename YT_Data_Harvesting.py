@@ -215,11 +215,11 @@ def store_data_mongo(alldata):
 
 
 def sql_connect():
-  sql_host = st.secrets["DB_HOST"]
-  sql_user = st.secrets["DB_USER"]
-  sql_password =st.secrets["DB_PASS"]
-  dbname = st.secrets["DB_NAME"]
-  sql_port = st.secrets["DB_PORT"]
+  sql_host = st.secrets["127.0.0.1"]
+  sql_user = st.secrets["root"]
+  sql_password =st.secrets["Gixxer@7071"]
+  dbname = st.secrets["yt_data"]
+  sql_port = st.secrets["3306"]
   conn = mysql.connector.connect(
          host = sql_host,
          port=sql_port,
@@ -235,8 +235,8 @@ def store_data_sql(conn,cursor,filterdata):
     if conn:
       mongourl = st.secrets["MONGOURL"]
       mongoclient = pymongo.MongoClient(mongourl)
-      db = mongoclient['']
-      collection = db['']
+      db = mongoclient['YT_Data']
+      collection = db['Col_1']
       fields = "channel.Channel_Id"
 
       for i in filterdata:
