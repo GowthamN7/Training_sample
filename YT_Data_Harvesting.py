@@ -14,7 +14,7 @@ def youtube_api_connect(api_key):
 def get_channel_data(youtube, channel_id):
   try:
     channel_request = youtube.channels().list(
-      part = "sinppet, contentDetails, Statistics",
+      part = "snippet, contentDetails, Statistics",
       id = channel_id
     )
     channel_response = channel_request.execute()
