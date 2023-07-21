@@ -215,11 +215,19 @@ def store_data_mongo(alldata):
 
 
 def sql_connect():
-  sql_host = "localhost"
-  sql_user = "root"
-  sql_password ="Gixxer@7071"
-  dbname = "yt_data_database"
-  sql_port = "3306"
+  sql_host = st.secrets["DB_HOST"]
+  sql_user = st.secrets["DB_USER"]
+  sql_password =st.secrets["DB_PASS"]
+  dbname = st.secrets["DB_NAME"]
+  sql_port = st.secrets["DB_PORT"]
+  conn = mysql.connector.connect(
+    host=sql_host,
+    port=sql_port,
+    user=sql_user,
+    password=sql_password,
+    database = dbname
+  )
+  return conn
 
 def store_data_sql(conn,cursor,filterdata):
   try:
