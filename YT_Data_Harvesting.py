@@ -224,8 +224,8 @@ def sql_connect():
 def store_data_sql(conn,cursor,filterdata):
   try:
     if conn:
-      mongourl = st.secrets["MONGOURL"]
-      mongoclient = pymongo.MongoClient(mongourl)
+      mongourl = "MONGOURL"
+      mongoclient = "mongodb+srv://UnknownUser:Gixxer@7071@cluster1.9wz8ul5.mongodb.net/"
       db = mongoclient['YT_Data']
       collection = db['Col_1']
       fields = "channel.Channel_Id"
