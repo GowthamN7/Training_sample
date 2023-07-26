@@ -1,7 +1,6 @@
 [secrets]
-DB_HOST = "localhost" 
+DB_HOST = "Gowtham-Asus"
 DB_USER = "root"
 DB_PASS = "Gixxer@7071"
 DB_NAME = "yt_data_database"
 DB_PORT = "3306"
-
