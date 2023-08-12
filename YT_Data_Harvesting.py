@@ -90,6 +90,9 @@ def get_video_data(youtube, playlist_id):
                     tags = video["snippet"].get("tags", [])
                     duration = isodate.parse_duration(video["contentDetails"]["duration"]).total_seconds()
 
+                    # Check if 'commentCount' key is present in video statistics
+                    comment_count = video["statistics"].get("commentCount", 0)
+
                     video_data = {
                         "video_id": video_id,
                         "video_title": video["snippet"]["title"],
@@ -100,7 +103,7 @@ def get_video_data(youtube, playlist_id):
                         "like_count": video["statistics"]["likeCount"],
                         "dislike_count": 0,
                         "favorite_count": video["statistics"]["favoriteCount"],
-                        "comment_count": video["statistics"]["commentCount"],
+                        "comment_count": comment_count,  # Use the retrieved comment count
                         "duration": duration,
                         "thumbnail": video["snippet"]["thumbnails"]["default"]["url"],
                         "caption_status": "Available" if video["contentDetails"]["caption"] else "Not Available",
@@ -111,7 +114,7 @@ def get_video_data(youtube, playlist_id):
 
                 videos_data.append(video_data)
 
-        return videos_data
+            return videos_data
     except HttpError as e:
         print("An HTTP error occurred:", e)
         return []
@@ -334,7 +337,16 @@ def create_database(db,sql_host,sql_user,sql_pass):
             password=sql_pass,
         )
         cursor = conn.cursor()
-        cursor.execute("CREATE DATABASE {}".format(db))
+        
+        cursor.execute("SHOW DATABASES")
+        existing_databases = [database[0] for database in cursor.fetchall()]
+        if db in existing_databases:
+            st.write(f"Database '{db}' already exists.")
+            conn.close()
+            return True
+
+        # Create the database
+        cursor.execute(f"CREATE DATABASE {db}")
         conn.close()
         conn = sql_connect()
         if conn:  
@@ -390,8 +402,12 @@ db_pass = "Gixxer@7071"
     
 def main():
     st.header("Youtube Data")
-    
-    tab1, tab2, tab3 = st.tabs(["Data", "Table","Query"])
+
+    # Ensure that the tables are created if they don't exist
+    create_success = create_table(conn, cursor, db_name)
+
+    if create_success:
+        tab1, tab2, tab3 = st.tabs(["Data", "Table", "Query"])
     
     conn = sql_connect()
     cursor = conn.cursor()
