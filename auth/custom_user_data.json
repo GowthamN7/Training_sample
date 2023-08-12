@@ -1,0 +1,7 @@
+{
+    "enabled": true,
+    "mongo_service_name": "yt_data_service",
+    "database_name": "YoutubeDatas",
+    "collection_name": "ChannelData",
+    "user_id_field": "gowtham_natarajan_7"
+}

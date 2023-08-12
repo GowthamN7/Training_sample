@@ -1,0 +1,10 @@
+{
+    "name": "yt_data_service",
+    "type": "mongodb-atlas",
+    "config": {
+        "clusterName": "DataSamples",
+        "readPreference": "primary",
+        "wireProtocolEnabled": true
+    },
+    "version": 1
+}
