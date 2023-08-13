@@ -191,10 +191,11 @@ def get_multiple_channel_data(channel_ids,apikey):
 
 
 def store_data_mongo(alldata):
-    mongourl = ["mongodb://Gowtham:Gixxer@7071@us-west-2.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=yt_project-hvbmk:yt_data_service:local-userpass"]
+    mongourl = ("mongodb://Gowtham:Fuck_yeah@us-west-2.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=yt_project-hvbmk:yt_data_service:local-userpass")
+    
     try:
         with pymongo.MongoClient(mongourl) as client:
-            db = client['YoutubeHacks']
+            db = client['YoutubeDatas']
             collection = db['ChannelData']
             
             inserted_channel_ids = []
@@ -244,7 +245,7 @@ def sql_connect():
 def store_data_sql(conn,cursor,filterdata):
     try:
         if conn:
-            mongourl = "mongodb://localhost:27017/?directConnection=true"
+            mongourl = ("mongodb://Gowtham:Fuck_yeah@us-west-2.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=yt_project-hvbmk:yt_data_service:local-userpass")
             mongoclient = pymongo.MongoClient(mongourl)
             db = mongoclient['YoutubeHacks']
             collection = db['ChannelData']
@@ -371,7 +372,118 @@ def create_database(db,sql_host,sql_user,sql_pass):
     except mysql.connector.Error as err:
         st.write("Error: {}".format(err))
         return False
-    
+def create_table(conn, cursor, db_name):
+    try:
+        if conn:
+            cursor.execute(f"USE {db_name}")
+
+            # Create channeldata table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS channeldata (
+                    channel_id VARCHAR(255) PRIMARY KEY,
+                    channel_name VARCHAR(255),
+                    subscription_count INT,
+                    channel_views INT,
+                    playlist_count INT,
+                    channel_description TEXT
+                )
+                """
+            )
+
+            # Create other tables (playlistdata, videodata, commentdata) in a similar way
+
+            st.write("Tables created successfully.")
+            return True
+
+    except mysql.connector.Error as err:
+        st.write("Error:", err)
+        return False
+
+def create_table(conn, cursor, db_name):
+    try:
+        if conn:
+            cursor.execute(f"USE {db_name}")
+
+            # Create playlistdata table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS playlistdata (
+                    playlist_id VARCHAR(255) PRIMARY KEY,
+                    channel_id VARCHAR(255),
+                    playlist_name VARCHAR(255)
+                )
+                """
+            )
+
+            # Create other tables (videodata, commentdata) in a similar way
+
+            st.write("Tables created successfully.")
+            return True
+
+    except mysql.connector.Error as err:
+        st.write("Error:", err)
+        return False
+
+def create_table(conn, cursor, db_name):
+    try:
+        if conn:
+            cursor.execute(f"USE {db_name}")
+
+            # Create videodata table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS videodata (
+                    video_id VARCHAR(255) PRIMARY KEY,
+                    playlist_id VARCHAR(255),
+                    video_name VARCHAR(255),
+                    video_description TEXT,
+                    published_date DATETIME,
+                    view_count INT,
+                    like_count INT,
+                    comment_count INT,
+                    duration INT,
+                    thumbnail VARCHAR(255),
+                    caption_status VARCHAR(255)
+                )
+                """
+            )
+
+            # Create other tables (commentdata) in a similar way
+
+            st.write("Tables created successfully.")
+            return True
+
+    except mysql.connector.Error as err:
+        st.write("Error:", err)
+        return False
+
+def create_table(conn, cursor, db_name):
+    try:
+        if conn:
+            cursor.execute(f"USE {db_name}")
+
+            # Create commentdata table
+            cursor.execute(
+                """
+                CREATE TABLE IF NOT EXISTS commentdata (
+                    comment_id VARCHAR(255) PRIMARY KEY,
+                    video_id VARCHAR(255),
+                    comment_text TEXT,
+                    comment_author VARCHAR(255),
+                    comment_published_date DATETIME
+                )
+                """
+            )
+
+            st.write("Tables created successfully.")
+            return True
+
+    except mysql.connector.Error as err:
+        st.write("Error:", err)
+        return False
+
+
 def query_sql_data(cursor, pos):
     queries = {
         1: "SELECT vd.video_name, cd.channel_name FROM videodata AS vd JOIN playlistdata AS pd ON vd.playlist_id = pd.playlist_id JOIN channeldata AS cd ON pd.channel_id = cd.channel_id",
@@ -402,12 +514,8 @@ db_pass = "Gixxer@7071"
     
 def main():
     st.header("Youtube Data")
-
-    # Ensure that the tables are created if they don't exist
-    create_success = create_table(conn, cursor, db_name)
-
-    if create_success:
-        tab1, tab2, tab3 = st.tabs(["Data", "Table", "Query"])
+    
+    tab1, tab2, tab3 = st.tabs(["Data", "Table","Query"])
     
     conn = sql_connect()
     cursor = conn.cursor()
@@ -415,7 +523,10 @@ def main():
     # Create the database and tables if they don't exist
     create_success = create_database("youtube_db", db_host, db_user, db_pass)
     
-    
+    if create_success:
+    # Create tables if they don't exist
+        create_success = create_table(conn, cursor, "youtube_db")
+
     if create_success:
     
         with tab1:
