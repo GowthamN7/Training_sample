@@ -191,7 +191,7 @@ def get_multiple_channel_data(channel_ids,apikey):
 
 
 def store_data_mongo(alldata):
-    mongourl = ("mongodb://Gowtham:Fuck_yeah@us-west-2.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=yt_project-hvbmk:yt_data_service:local-userpass")
+    mongourl = ("mongodb://Gowtham:Fuck_yeah@federateddatabaseinstance0-dl5xg.a.query.mongodb.net/?ssl=true&authSource=admin")
     
     try:
         with pymongo.MongoClient(mongourl) as client:
@@ -245,7 +245,7 @@ def sql_connect():
 def store_data_sql(conn,cursor,filterdata):
     try:
         if conn:
-            mongourl = ("mongodb://Gowtham:Fuck_yeah@us-west-2.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=yt_project-hvbmk:yt_data_service:local-userpass")
+            mongourl = ("mongodb://Gowtham:Fuck_yeah@federateddatabaseinstance0-dl5xg.a.query.mongodb.net/?ssl=true&authSource=admin")
             mongoclient = pymongo.MongoClient(mongourl)
             db = mongoclient['YoutubeHacks']
             collection = db['ChannelData']
