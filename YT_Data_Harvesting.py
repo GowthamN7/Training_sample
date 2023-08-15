@@ -1,4 +1,5 @@
 import streamlit as st
+import urllib.parse
 import json
 import pymongo
 import mysql.connector
@@ -6,7 +7,12 @@ import isodate
 import pandas as pd
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+from datetime import datetime
 
+
+iso_datetime = '2023-08-01T09:21:39Z'
+python_datetime = datetime.strptime(iso_datetime, '%Y-%m-%dT%H:%M:%SZ')
+mysql_datetime = python_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
 def youtube_api_connect(api_key):
     youtube = build("youtube", "v3", developerKey=api_key)
@@ -191,8 +197,9 @@ def get_multiple_channel_data(channel_ids,apikey):
 
 
 def store_data_mongo(alldata):
-    mongourl = ("mongodb://Gowtham:Fuck_yeah@federateddatabaseinstance0-dl5xg.a.query.mongodb.net/?ssl=true&authSource=admin")
-    
+    mongourl = 'mongodb+srv://Gowtham:Gixxer%407071@atlascluster.cnx3dlh.mongodb.net/'
+    #mongourl = "mongodb://Gowtham:Gixxer@7071@us-east-1.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=youtube_data-smrts:mongodb-atlas:local-userpass"
+    #mongourl = 'mongodb://Gowtham:Gixxer@7071@ac-ggqn8fs-shard-00-00.cnx3dlh.mongodb.net:27017,ac-ggqn8fs-shard-00-01.cnx3dlh.mongodb.net:27017,ac-ggqn8fs-shard-00-02.cnx3dlh.mongodb.net:27017/?ssl=true&replicaset=atlas-149suw-shard-0&authSource=admin&retryWrites=true&w=majority'
     try:
         with pymongo.MongoClient(mongourl) as client:
             db = client['YoutubeDatas']
@@ -223,7 +230,7 @@ def store_data_mongo(alldata):
 
     return None
 
-apikey = "AIzaSyBqWEVqZ7l6RayrN45KaDiFxQtWiQXYDQA"
+#apikey = "AIzaSyBqWEVqZ7l6RayrN45KaDiFxQtWiQXYDQA"
 def sql_connect():
     db_host = "localhost"
     db_user = "root"
@@ -245,9 +252,9 @@ def sql_connect():
 def store_data_sql(conn,cursor,filterdata):
     try:
         if conn:
-            mongourl = ("mongodb://Gowtham:Fuck_yeah@federateddatabaseinstance0-dl5xg.a.query.mongodb.net/?ssl=true&authSource=admin")
+            mongourl = 'mongodb+srv://Gowtham:Gixxer%407071@atlascluster.cnx3dlh.mongodb.net/'
             mongoclient = pymongo.MongoClient(mongourl)
-            db = mongoclient['YoutubeHacks']
+            db = mongoclient['YoutubeDatas']
             collection = db['ChannelData']
             fields = "channel.Channel_Id"
             
@@ -264,53 +271,65 @@ def store_data_sql(conn,cursor,filterdata):
                 else:
                     document = collection.find_one({fields: i})
                     # Insert Channel data
-                    channel_data = document['channel']
-                    channel_values = (
-                        channel_data['Channel_Id'],
-                        channel_data['Channel_name'],
-                        channel_data['Subscription_count'],
-                        channel_data['Channel_views'],
-                        channel_data['Playlist_count'],
-                        channel_data['Channel_description']
-                    )
-                    q1 = "INSERT INTO channeldata (channel_id, channel_name, subscription_count, channel_views, playlist_count, channel_description) VALUES (%s, %s, %s, %s, %s, %s)"
-                    cursor.execute(q1, channel_values)
-
-                    # Insert Playlist Data
-                    playlist_values = []
-                    video_values = []
-                    comment_values = []
                     
-                    for playlist in channel_data['Playlists']:
-                        playlist_values.append((
-                            playlist['playlist_id'],
-                            channel_data['Channel_Id'],
-                            playlist['playlist_name']
+
+                channel_data = document['channel']
+                channel_values = (
+                    channel_data['Channel_Id'],
+                    channel_data['Channel_name'],
+                    channel_data['Subscription_count'],
+                    channel_data['Channel_views'],
+                    channel_data['Playlist_count'],
+                    channel_data['Channel_description']
+                )
+                q1 = "INSERT INTO channeldata (channel_id, channel_name, subscription_count, channel_views, playlist_count, channel_description) VALUES (%s, %s, %s, %s, %s, %s)"
+                cursor.execute(q1, channel_values)
+                    # Insert Playlist Data
+                playlist_values = []
+                video_values = []
+                comment_values = []
+                    
+                for playlist in channel_data['Playlists']:
+                    playlist_id = playlist['playlist_id']
+                    playlist_name = playlist['playlist_name']
+
+                    cursor.execute("SELECT playlist_id FROM playlistdata WHERE playlist_id = %s", (playlist_id,))
+                    existing_playlist = cursor.fetchone()
+                    
+                    if existing_playlist:
+                        st.write(f"Playlist with ID {playlist_id} already exists. Skipping insertion.")
+                        continue
+
+                    playlist_values.append((
+                        playlist_id,
+                        channel_data['Channel_Id'],
+                        playlist_name
+                    ))
+
+                    for video in playlist['videos']:
+                        video_values.append((
+                            video['video_id'],
+                            playlist_id,
+                            video['video_title'],
+                            video['video_description'],
+                            # Convert published_at to MySQL-compatible format
+                            video['published_at'].replace("T", " ").replace("Z", ""),
+                            video['view_count'],
+                            video['like_count'],
+                            video['comment_count'],
+                            video['duration'],
+                            video['thumbnail'],
+                            video['caption_status']
                         ))
 
-                        for video in playlist['videos']:
-                            video_values.append((
+                        for comment in video['comments']:
+                            comment_values.append((
+                                comment['comment_id'],
                                 video['video_id'],
-                                playlist['playlist_id'],
-                                video['video_title'],
-                                video['video_description'],
-                                video['published_at'],
-                                video['view_count'],
-                                video['like_count'],
-                                video['comment_count'],
-                                video['duration'],
-                                video['thumbnail'],
-                                video['caption_status']
+                                comment['comment_text'],
+                                comment['comment_author'],
+                                comment['comment_published_at']
                             ))
-
-                            for comment in video['comments']:
-                                comment_values.append((
-                                    comment['comment_id'],
-                                    video['video_id'],
-                                    comment['comment_text'],
-                                    comment['comment_author'],
-                                    comment['comment_published_at']
-                                ))
 
                     q2 = "INSERT INTO playlistdata (playlist_id, channel_id, playlist_name) VALUES (%s, %s, %s)"
                     cursor.executemany(q2, playlist_values)
@@ -381,7 +400,8 @@ def create_table(conn, cursor, db_name):
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS channeldata (
-                    channel_id VARCHAR(255) PRIMARY KEY,
+                    id int AUTO_INCREMENT PRIMARY KEY,
+                    channel_id VARCHAR(255),
                     channel_name VARCHAR(255),
                     subscription_count INT,
                     channel_views INT,
@@ -390,7 +410,7 @@ def create_table(conn, cursor, db_name):
                 )
                 """
             )
-
+            
             # Create other tables (playlistdata, videodata, commentdata) in a similar way
 
             st.write("Tables created successfully.")
@@ -409,7 +429,8 @@ def create_table(conn, cursor, db_name):
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS playlistdata (
-                    playlist_id VARCHAR(255) PRIMARY KEY,
+                    id int AUTO_INCREMENT PRIMARY KEY,
+                    playlist_id VARCHAR(255),
                     channel_id VARCHAR(255),
                     playlist_name VARCHAR(255)
                 )
@@ -434,11 +455,12 @@ def create_table(conn, cursor, db_name):
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS videodata (
-                    video_id VARCHAR(255) PRIMARY KEY,
+                    id int AUTO_INCREMENT PRIMARY KEY,
+                    video_id VARCHAR(255),
                     playlist_id VARCHAR(255),
                     video_name VARCHAR(255),
                     video_description TEXT,
-                    published_date DATETIME,
+                    published_date VARCHAR(255),
                     view_count INT,
                     like_count INT,
                     comment_count INT,
@@ -467,11 +489,12 @@ def create_table(conn, cursor, db_name):
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS commentdata (
-                    comment_id VARCHAR(255) PRIMARY KEY,
+                    id int AUTO_INCREMENT PRIMARY KEY,
+                    comment_id VARCHAR(255),
                     video_id VARCHAR(255),
                     comment_text TEXT,
                     comment_author VARCHAR(255),
-                    comment_published_date DATETIME
+                    comment_published_date VARCHAR(255)
                 )
                 """
             )
@@ -517,14 +540,16 @@ def main():
     
     tab1, tab2, tab3 = st.tabs(["Data", "Table","Query"])
     
-    conn = sql_connect()
-    cursor = conn.cursor()
+    #conn = sql_connect()
+    #cursor = conn.cursor()
     
     # Create the database and tables if they don't exist
     create_success = create_database("youtube_db", db_host, db_user, db_pass)
     
     if create_success:
     # Create tables if they don't exist
+        conn = sql_connect()
+        cursor = conn.cursor()
         create_success = create_table(conn, cursor, "youtube_db")
 
     if create_success:
