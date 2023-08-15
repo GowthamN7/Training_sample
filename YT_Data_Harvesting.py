@@ -460,7 +460,7 @@ def create_table(conn, cursor, db_name):
                     playlist_id VARCHAR(255),
                     video_name VARCHAR(255),
                     video_description TEXT,
-                    published_date VARCHAR(255),
+                    published_date DATETIME,
                     view_count INT,
                     like_count INT,
                     comment_count INT,
@@ -494,7 +494,7 @@ def create_table(conn, cursor, db_name):
                     video_id VARCHAR(255),
                     comment_text TEXT,
                     comment_author VARCHAR(255),
-                    comment_published_date VARCHAR(255)
+                    comment_published_date DATETIME
                 )
                 """
             )
