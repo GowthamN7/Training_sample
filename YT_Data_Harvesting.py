@@ -413,7 +413,7 @@ def create_table(conn, cursor, db_name):
                     subscription_count INT,
                     channel_views INT,
                     playlist_count INT,
-                    channel_description TEXT
+                    channel_description VARCHAR()
                 )
                 """
             )
