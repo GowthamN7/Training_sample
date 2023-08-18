@@ -403,7 +403,7 @@ def create_table(conn, cursor, db_name):
                     subscription_count INT,
                     channel_views INT,
                     playlist_count INT,
-                    channel_description VARCHAR()
+                    channel_description VARCHAR
                 )
                 """
             )
