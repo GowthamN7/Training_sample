@@ -237,7 +237,7 @@ def sql_connect():
         password=db_pass,
         database=db_name,
         port=db_port
-        charset='utf8mb4'
+        
     )
     return conn
 
