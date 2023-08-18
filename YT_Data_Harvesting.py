@@ -7,12 +7,7 @@ import isodate
 import pandas as pd
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
-from datetime import datetime
 
-
-iso_datetime = '2023-08-01T09:21:39Z'
-python_datetime = datetime.strptime(iso_datetime, '%Y-%m-%dT%H:%M:%SZ')
-mysql_datetime = python_datetime.strftime('%Y-%m-%d %H:%M:%S')
 
 def youtube_api_connect(api_key):
     youtube = build("youtube", "v3", developerKey=api_key)
@@ -198,8 +193,7 @@ def get_multiple_channel_data(channel_ids,apikey):
 
 def store_data_mongo(alldata):
     mongourl = 'mongodb+srv://Gowtham:Gixxer%407071@atlascluster.cnx3dlh.mongodb.net/'
-    #mongourl = "mongodb://Gowtham:Gixxer@7071@us-east-1.aws.realm.mongodb.com:27020/?authMechanism=PLAIN&authSource=%24external&ssl=true&appName=youtube_data-smrts:mongodb-atlas:local-userpass"
-    #mongourl = 'mongodb://Gowtham:Gixxer@7071@ac-ggqn8fs-shard-00-00.cnx3dlh.mongodb.net:27017,ac-ggqn8fs-shard-00-01.cnx3dlh.mongodb.net:27017,ac-ggqn8fs-shard-00-02.cnx3dlh.mongodb.net:27017/?ssl=true&replicaset=atlas-149suw-shard-0&authSource=admin&retryWrites=true&w=majority'
+    
     try:
         with pymongo.MongoClient(mongourl) as client:
             db = client['YoutubeDatas']
@@ -230,7 +224,6 @@ def store_data_mongo(alldata):
 
     return None
 
-#apikey = "AIzaSyBqWEVqZ7l6RayrN45KaDiFxQtWiQXYDQA"
 def sql_connect():
     db_host = "localhost"
     db_user = "root"
@@ -391,6 +384,8 @@ def create_database(db,sql_host,sql_user,sql_pass):
     except mysql.connector.Error as err:
         st.write("Error: {}".format(err))
         return False
+    
+
 def create_table(conn, cursor, db_name):
     try:
         if conn:
@@ -410,20 +405,6 @@ def create_table(conn, cursor, db_name):
                 )
                 """
             )
-            
-            # Create other tables (playlistdata, videodata, commentdata) in a similar way
-
-            st.write("Tables created successfully.")
-            return True
-
-    except mysql.connector.Error as err:
-        st.write("Error:", err)
-        return False
-
-def create_table(conn, cursor, db_name):
-    try:
-        if conn:
-            cursor.execute(f"USE {db_name}")
 
             # Create playlistdata table
             cursor.execute(
@@ -437,20 +418,6 @@ def create_table(conn, cursor, db_name):
                 """
             )
 
-            # Create other tables (videodata, commentdata) in a similar way
-
-            st.write("Tables created successfully.")
-            return True
-
-    except mysql.connector.Error as err:
-        st.write("Error:", err)
-        return False
-
-def create_table(conn, cursor, db_name):
-    try:
-        if conn:
-            cursor.execute(f"USE {db_name}")
-
             # Create videodata table
             cursor.execute(
                 """
@@ -460,7 +427,7 @@ def create_table(conn, cursor, db_name):
                     playlist_id VARCHAR(255),
                     video_name VARCHAR(255),
                     video_description TEXT,
-                    published_date DATETIME,
+                    published_date VARCHAR(255),
                     view_count INT,
                     like_count INT,
                     comment_count INT,
@@ -471,20 +438,6 @@ def create_table(conn, cursor, db_name):
                 """
             )
 
-            # Create other tables (commentdata) in a similar way
-
-            st.write("Tables created successfully.")
-            return True
-
-    except mysql.connector.Error as err:
-        st.write("Error:", err)
-        return False
-
-def create_table(conn, cursor, db_name):
-    try:
-        if conn:
-            cursor.execute(f"USE {db_name}")
-
             # Create commentdata table
             cursor.execute(
                 """
@@ -494,7 +447,7 @@ def create_table(conn, cursor, db_name):
                     video_id VARCHAR(255),
                     comment_text TEXT,
                     comment_author VARCHAR(255),
-                    comment_published_date DATETIME
+                    comment_published_date VARCHAR(255)
                 )
                 """
             )
