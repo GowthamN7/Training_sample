@@ -231,14 +231,24 @@ def sql_connect():
     db_name = "btrbcd6vvzjbmhuwunnx"
     db_port = "3306"
     
-    conn = mysql.connector.connect(
+    connection_config = {
+        "host": db_host,
+        "user": db_user,
+        "password": db_pass,
+        "database": db_name,
+        "port": db_port,
+        "charset": 'utf8mb4'  # Set the character set
+    }
+    
+    conn = mysql.connector.connect(**connection_config)
+    """conn = mysql.connector.connect(
         host=db_host,
         user=db_user,
         password=db_pass,
         database=db_name,
         port=db_port
         charset='utf8mb4'
-    )
+    )"""
     return conn
 
 
