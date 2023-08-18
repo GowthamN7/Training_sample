@@ -497,13 +497,13 @@ def main():
     #cursor = conn.cursor()
     
     # Create the database and tables if they don't exist
-    create_success = create_database("youtube_db", db_host, db_user, db_pass)
+    create_success = create_database("btrbcd6vvzjbmhuwunnx", db_host, db_user, db_pass)
     
     if create_success:
     # Create tables if they don't exist
         conn = sql_connect()
         cursor = conn.cursor()
-        create_success = create_table(conn, cursor, "youtube_db")
+        create_success = create_table(conn, cursor, "btrbcd6vvzjbmhuwunnx")
 
     if create_success:
     
