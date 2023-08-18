@@ -237,6 +237,7 @@ def sql_connect():
         password=db_pass,
         database=db_name,
         port=db_port
+        charset='utf8mb4'
     )
     return conn
 
@@ -275,6 +276,7 @@ def store_data_sql(conn,cursor,filterdata):
                     channel_data['Playlist_count'],
                     channel_data['Channel_description']
                 )
+                
                 q1 = "INSERT INTO channeldata (channel_id, channel_name, subscription_count, channel_views, playlist_count, channel_description) VALUES (%s, %s, %s, %s, %s, %s)"
                 cursor.execute(q1, channel_values)
                     # Insert Playlist Data
