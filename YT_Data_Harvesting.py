@@ -225,7 +225,7 @@ def store_data_mongo(alldata):
     return None
 
 def sql_connect():
-    db_host = "127.0.0.1"
+    db_host = "127.0.0.2"
     db_user = "root"
     db_pass = "Gixxer@7071"
     db_name = "youtube_db"
@@ -484,7 +484,7 @@ def query_sql_data(cursor, pos):
     else:
         return None
 
-db_host = "127.0.0.1"
+db_host = "127.0.0.2"
 db_user = "root"
 db_pass = "Gixxer@7071"    
     
