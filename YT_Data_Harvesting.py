@@ -492,128 +492,89 @@ db_pass = "MMbx7ma45TYcXKLBa51x"
     
 def main():
     st.header("Youtube Data")
-    
-    tab1, tab2, tab3 = st.tabs(["Data", "Table","Query"])
-    
-    #conn = sql_connect()
-    #cursor = conn.cursor()
-    
-    # Create the database and tables if they don't exist
-    create_success = create_database("btrbcd6vvzjbmhuwunnx", db_host, db_user, db_pass)
-    
-    if create_success:
-    # Create tables if they don't exist
-        conn = sql_connect()
+
+    mongourl = 'your_mongodb_connection_string_here'
+    conn = sql_connect()
+
+    if conn:
         cursor = conn.cursor()
-        create_success = create_table(conn, cursor, "btrbcd6vvzjbmhuwunnx")
 
-    if create_success:
+    st.subheader("Fetch Data")
+    apikey = "AIzaSyDyx5PRxlHl83aCN62yMl0fnQkyFFCoyo4"  
+    st.write("To convert a channel name into a YouTube channel URL, you can use the following link:")
+    st.write("[Convert Channel Name to Channel URL](https://commentpicker.com/youtube-channel-id.php)")
+    st.write("After obtaining the channel URL, copy the channel ID from the URL and enter it below:")
+    c_id = st.text_input("Channel ID:")
+
+    if c_id and apikey:
+        chdata, alldata = get_multiple_channel_data(c_id, apikey)
+        st.json(chdata)
+
+        if st.button("Store Data"):
+            filterdata = store_data_mongo(alldata)
+            store_data_sql(conn, cursor, filterdata)
+
+    st.subheader("Data")
     
-        with tab1:
-            st.header("Fetch Data")
-            apikey = st.text_input("API Key:")
-            c_id = st.text_input("Channel ID:")
+    if conn:
+        q1 = "SELECT * FROM channeldata"
+        cursor.execute(q1)
+        rows = cursor.fetchall()
+        df_channels = pd.DataFrame(rows, columns=cursor.column_names)
 
-            if c_id and apikey:
-                chdata, alldata = get_multiple_channel_data(c_id,apikey)
-                st.json(chdata)
+        q2 = "SELECT * FROM playlistdata"
+        cursor.execute(q2)
+        playlist_rows = cursor.fetchall()
+        df_playlists = pd.DataFrame(playlist_rows, columns=cursor.column_names)
 
-                if st.button("Store Data"):
-                    filterdata = store_data_mongo(alldata)
-                    store_data_sql(conn,cursor,filterdata)
-                
-                
-        with tab2:
-            st.header("Table")
+        q3 = "SELECT * FROM videodata"
+        cursor.execute(q3)
+        video_rows = cursor.fetchall()
+        df_videos = pd.DataFrame(video_rows, columns=cursor.column_names)
 
-            if conn:
-                q1 = "SELECT * FROM channeldata"
-                cursor.execute(q1)
-                rows = cursor.fetchall()
+        q4 = "SELECT * FROM commentdata"
+        cursor.execute(q4)
+        comment_rows = cursor.fetchall()
+        df_comments = pd.DataFrame(comment_rows, columns=cursor.column_names)
 
-                # Convert the rows to a DataFrame
-                df = pd.DataFrame(rows, columns=cursor.column_names)
-                df.index = df.index + 1
+        st.write("Channels List")
+        st.dataframe(df_channels)
 
-                # Display the DataFrame as a table in Streamlit
-                st.write("Channels List")
+        st.write("Playlist List")
+        st.dataframe(df_playlists)
 
-                table_style = f"""
-                    <style>
-                        .dataframe tbody tr {{
-                            height: 30px;
-                        }}
-                        .dataframe table {{
-                            height: 200px;
-                            width: 1000px;
-                        }}
-                        .dataframe thead th:first-child,
-                        .dataframe tbody tr:first-child {{
-                            background-color: #f2f2f2;
-                            position: sticky;
-                            top: 0;
-                            z-index: 1;
-                        }}
-                    </style>
-                """
-                st.markdown(table_style, unsafe_allow_html=True)
-                st.dataframe(df)
+        st.write("Video List")
+        st.dataframe(df_videos)
 
+        st.write("Comment List")
+        st.dataframe(df_comments)
 
-                q2 = "SELECT * FROM playlistdata"
-                cursor.execute(q2)
-                playlist_rows = cursor.fetchall()
-                playlist_df = pd.DataFrame(playlist_rows, columns=cursor.column_names)
-                playlist_df.index = playlist_df.index + 1
-                st.write("Playlist List")
-                st.dataframe(playlist_df)
+    st.subheader("Query")
 
-                q3 = "SELECT * FROM videodata"
-                cursor.execute(q3)
-                video_rows = cursor.fetchall()
-                video_df = pd.DataFrame(video_rows, columns=cursor.column_names)
-                video_df.index = video_df.index + 1
-                st.write("Video List")
-                st.dataframe(video_df)
+    options = [
+        "Select a Question from the List",
+        "What are the names of all the videos and their corresponding channels?",
+        "Which channels have the most number of videos, and how many videos do they have?",
+        "What are the top 10 most viewed videos and their respective channels?",
+        "How many comments were made on each video, and what are their corresponding video names?",
+        "Which videos have the highest number of likes, and what are their corresponding channel names?",
+        "What is the total number of likes and dislikes for each video, and what are their corresponding video names?",
+        "What is the total number of views for each channel, and what are their corresponding channel names?",
+        "What are the names of all the channels that have published videos in the year 2022?",
+        "What is the average duration of all videos in each channel, and what are their corresponding channel names?",
+        "Which videos have the highest number of comments, and what are their corresponding channel names?"
+    ]
 
-                q4 = "SELECT * FROM commentdata"
-                cursor.execute(q4)
-                comment_rows = cursor.fetchall()
-                comment_df = pd.DataFrame(comment_rows, columns=cursor.column_names)
-                comment_df.index = comment_df.index + 1
-                st.write("Comment List")
-                st.dataframe(comment_df)
+    selected_option = st.selectbox("Ask a Question:", options)
 
+    # Get the position of the selected option
+    position = options.index(selected_option)
 
+    retriveddata = query_sql_data(cursor, position)
 
-        with tab3:
-            st.header("Query")
+    st.write("Query Results:")
+    st.table(retriveddata)
 
-            options = [
-                "Select a Question from the List",
-                "What are the names of all the videos and their corresponding channels?",
-                "Which channels have the most number of videos, and how many videos do they have?",
-                "What are the top 10 most viewed videos and their respective channels?",
-                "How many comments were made on each video, and what are their corresponding video names?",
-                "Which videos have the highest number of likes, and what are their corresponding channel names?",
-                "What is the total number of likes and dislikes for each video, and what are their corresponding video names?",
-                "What is the total number of views for each channel, and what are their corresponding channel names?",
-                "What are the names of all the channels that have published videos in the year 2022?",
-                "What is the average duration of all videos in each channel, and what are their corresponding channel names?",
-                "Which videos have the highest number of comments, and what are their corresponding channel names?"
-            ]
-
-            selected_option = st.selectbox("Ask a Question:", options)
-
-            # Get the position of the selected option
-            position = options.index(selected_option)
-
-            retriveddata = query_sql_data(cursor,position)
-
-            st.table(retriveddata)
-    else:
-        st.write("Failed to create database or tables.")
-        
 
 if __name__ == "__main__":
     main()
