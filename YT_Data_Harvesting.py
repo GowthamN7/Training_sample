@@ -225,10 +225,10 @@ def store_data_mongo(alldata):
     return None
 
 def sql_connect():
-    db_host = "btrbcd6vvzjbmhuwunnx-mysql.services.clever-cloud.com"
-    db_user = "u5ecdenfwtjcktf9"
-    db_pass = "MMbx7ma45TYcXKLBa51x"
-    db_name = "btrbcd6vvzjbmhuwunnx"
+    db_host = "birir8435e6eowqsj8tt-mysql.services.clever-cloud.com"
+    db_user = "uw7bgi9pguzpne4x"
+    db_pass = "IznoFDAO0bBr0cSS7LC6"
+    db_name = "birir8435e6eowqsj8tt"
     db_port = "3306"
     
     conn = mysql.connector.connect(
@@ -486,9 +486,9 @@ def query_sql_data(cursor, pos):
     else:
         return None
 
-db_host = "btrbcd6vvzjbmhuwunnx-mysql.services.clever-cloud.com"
-db_user = "u5ecdenfwtjcktf9"
-db_pass = "MMbx7ma45TYcXKLBa51x"    
+db_host = "birir8435e6eowqsj8tt-mysql.services.clever-cloud.com"
+db_user = "uw7bgi9pguzpne4x"
+db_pass = "IznoFDAO0bBr0cSS7LC6"    
     
 def main():
     st.header("Youtube Data")
